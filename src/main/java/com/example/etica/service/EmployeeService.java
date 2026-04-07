@@ -11,4 +11,6 @@ public interface EmployeeService {
     Optional<EmployeeDTO> getEmployeeById(Long id);
     List<EmployeeDTO> getEmployeesByPuesto(String puesto);
     EmployeeDTO createEmployee(EmployeeDTO employeeDTO);
+    EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO);
+    void deleteEmployee(Long id);
 }

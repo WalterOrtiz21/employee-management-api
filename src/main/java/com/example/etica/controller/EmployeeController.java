@@ -16,8 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.etica.exception.ResourceNotFoundException;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -70,20 +71,12 @@ public class EmployeeController {
                                           """)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<?> getEmployeeById(
+    public ResponseEntity<EmployeeDTO> getEmployeeById(
             @Parameter(description = "ID único del empleado", example = "1", required = true)
             @PathVariable Long id) {
-        Optional<EmployeeDTO> employee = employeeService.getEmployeeById(id);
-        if (employee.isPresent()) {
-            return ResponseEntity.ok(employee.get());
-        } else {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    "Empleado no encontrado",
-                    "No existe un empleado con ID: " + id,
-                    HttpStatus.NOT_FOUND.value()
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-        }
+        EmployeeDTO employee = employeeService.getEmployeeById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un empleado con ID: " + id));
+        return ResponseEntity.ok(employee);
     }
 
     @Operation(summary = "Buscar empleados por puesto",
@@ -152,5 +145,34 @@ public class EmployeeController {
             @Valid @RequestBody EmployeeDTO employee) {
         EmployeeDTO createdEmployee = employeeService.createEmployee(employee);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEmployee);
+    }
+
+    @Operation(summary = "Actualizar empleado", description = "Actualiza los datos de un empleado existente")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Empleado actualizado exitosamente",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = EmployeeDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Empleado no encontrado",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeDTO> updateEmployee(
+            @Parameter(description = "ID único del empleado", example = "1", required = true)
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeDTO employeeDTO) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, employeeDTO));
+    }
+
+    @Operation(summary = "Eliminar empleado", description = "Elimina un empleado del sistema por su ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Empleado eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Empleado no encontrado",
+                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(
+            @Parameter(description = "ID único del empleado", example = "1", required = true)
+            @PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+        return ResponseEntity.noContent().build();
     }
 }

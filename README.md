@@ -1,6 +1,6 @@
-# API de Gestión de Empleados
+# Employee Management API
 
-API REST desarrollada con Spring Boot para la gestión de empleados de una empresa.
+REST API built with Spring Boot for employee management. Demonstrates clean layered architecture, input validation, centralized exception handling, Swagger/OpenAPI documentation, and a dual test suite with JUnit 5 and Spock (Groovy).
 
 ## Descripción del Proyecto
 
@@ -11,10 +11,14 @@ Este proyecto implementa un microservicio REST que permite gestionar informació
 - ✅ Listar todos los empleados
 - ✅ Obtener empleado por ID
 - ✅ Buscar empleados por puesto de trabajo
-- ✅ Crear nuevos empleados
+- ✅ Crear nuevo empleado
+- ✅ Actualizar empleado existente
+- ✅ Eliminar empleado
 - ✅ Validación de datos de entrada
 - ✅ Manejo centralizado de excepciones
-- ✅ Documentación automática con Swagger
+- ✅ Documentación automática con Swagger/OpenAPI
+- ✅ Tests unitarios con JUnit 5 + Mockito (service layer)
+- ✅ Tests de integración con Spock + Groovy (controller layer)
 
 ## Tecnologías Utilizadas
 
@@ -24,9 +28,11 @@ Este proyecto implementa un microservicio REST que permite gestionar informació
 - **Spring Boot Validation**
 - **MySQL 8.0**
 - **Lombok**
-- **Swagger/OpenAPI 3**
+- **Swagger/OpenAPI 3** (springdoc)
 - **Docker & Docker Compose**
-- **Maven**
+- **Apache Maven**
+- **JUnit 5 + Mockito** (unit tests)
+- **Spock Framework 2.3 + Groovy 4** (controller tests)
 
 ## Prerequisitos
 
@@ -38,8 +44,8 @@ Este proyecto implementa un microservicio REST que permite gestionar informació
 
 ### 1. Clonar el repositorio
 ```bash
-git clone <url-del-repositorio>
-cd test-etica
+git clone https://github.com/WalterOrtiz21/employee-management-api.git
+cd employee-management-api
 ```
 
 ### 2. Levantar la base de datos
@@ -70,6 +76,8 @@ La aplicación estará disponible en: `http://localhost:8080`
 | GET    | `/api/employees/{id}` | Obtiene un empleado específico por ID |
 | GET    | `/api/employees/search?puesto={puesto}` | Busca empleados por puesto de trabajo |
 | POST   | `/api/employees` | Crea un nuevo empleado |
+| PUT    | `/api/employees/{id}` | Actualiza un empleado existente |
+| DELETE | `/api/employees/{id}` | Elimina un empleado |
 
 ## Modelo de Datos
 
@@ -100,6 +108,22 @@ Database: employeedb
 Username: admin
 Password: password
 ```
+
+## Testing
+
+El proyecto usa dos frameworks de testing complementarios:
+
+```bash
+./mvnw test
+```
+
+| Framework | Capa | Archivo |
+|-----------|------|---------|
+| **JUnit 5 + Mockito** | Service | `EmployeeServiceImplTest.java` |
+| **Spock + Groovy** | Controller (MockMvc) | `EmployeeControllerSpec.groovy` |
+
+- Los tests de servicio validan la lógica de negocio con mocks del repositorio
+- Los tests Spock cubren todos los endpoints: respuestas 200/201/204/400/404
 
 ## Arquitectura del Proyecto
 

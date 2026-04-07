@@ -1,6 +1,7 @@
 package com.example.etica.service.impl;
 
 import com.example.etica.dto.EmployeeDTO;
+import com.example.etica.exception.ResourceNotFoundException;
 import com.example.etica.mapper.EmployeeMapper;
 import com.example.etica.model.Employee;
 import com.example.etica.repository.EmployeeRepository;
@@ -49,5 +50,23 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employeeToSave = employeeMapper.toEntity(employeeDTO);
         Employee savedEmployee = employeeRepository.save(employeeToSave);
         return employeeMapper.toDto(savedEmployee);
+    }
+
+    @Override
+    public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
+        Employee existing = employeeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un empleado con ID: " + id));
+        existing.setNombre(employeeDTO.getNombre());
+        existing.setPuesto(employeeDTO.getPuesto());
+        existing.setSalario(employeeDTO.getSalario());
+        return employeeMapper.toDto(employeeRepository.save(existing));
+    }
+
+    @Override
+    public void deleteEmployee(Long id) {
+        if (!employeeRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No existe un empleado con ID: " + id);
+        }
+        employeeRepository.deleteById(id);
     }
 }
